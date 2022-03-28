@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
 
 function App() {
+  const [jobs, setJobs] = useState(
+    (() => {
+      const storage = JSON.parse(localStorage.getItem("jobs"));
+      return storage;
+    }) || []
+  );
+  const [job, setJob] = useState("");
+
+  const handleSubmit = () => {
+    setJobs((prev) => {
+      const newJob = [...prev, job];
+
+      const jsonJobs = JSON.stringify(newJob);
+      localStorage.setItem("jobs", jsonJobs);
+      return newJob;
+    });
+    setJob("");
+  };
+  const handleDelete = (job) => {
+    setJobs((prev) => {
+      const newJob = prev.filter((item, id) => id !== job);
+      const jsonJobs = JSON.stringify(newJob);
+      localStorage.setItem("jobs", jsonJobs);
+      console.log(newJob);
+      return newJob;
+    });
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input value={job} onChange={(e) => setJob(e.target.value)} />
+      <button onClick={handleSubmit}>add</button>
+      <ul>
+        {jobs.map((job, index) => (
+          <li key={index}>
+            {job}
+            <i style={{ marginLeft: 30 }} onClick={() => handleDelete(index)}>
+              xoa
+            </i>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
